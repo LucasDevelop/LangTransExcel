@@ -14,6 +14,7 @@ import org.dom4j.CDATA
 import org.dom4j.io.SAXReader
 import java.io.File
 import java.io.FileOutputStream
+import java.util.regex.Pattern
 
 /**
  * File TransformUtil.kt
@@ -185,9 +186,11 @@ object TransXmlToExcel {
         FileUtil.findAllFile(projectPathFile, xmlFiles) {
             //匹配文件规则
             val parentFile = it.parentFile
+            val matches = Pattern.compile(parserConfig.dirPattern).matcher(parentFile.name).find()
+//            val matches = parentFile.name.matches(Regex(parserConfig.dirPattern))
             return@findAllFile parentFile != null &&
                     parentFile.isDirectory &&
-                    parentFile.name.matches(Regex(parserConfig.dirPattern)) &&
+                    matches &&
                     it.name.equals("strings.xml")
         }
         logDividerStart("扫描项目xml文件")

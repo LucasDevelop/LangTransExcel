@@ -87,6 +87,9 @@ public class InitConfigDialog extends JDialog {
         String[] split = null;
         if (langTypes != null && !langTypes.equals("")) {
             split = langTypes.split(",");
+            for (int i = 0; i < split.length; i++) {//去除空格
+                split[i] = split[i].replace(" ","");
+            }
         }
         if (projectName == "") {
             Messages.showInfoMessage("请填写项目名称！", "错误");

@@ -7,11 +7,13 @@ import com.lucas.lang.utils.TransXmlToExcel;
 import com.lucas.lang.utils.ParserConfig;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 
 public class ProgressLogDialog extends JDialog {
     private JPanel contentPane;
     private JTextArea v_log;
+    private JScrollPane v_scroll;
     private JButton buttonOK;
 //    private JButton buttonCancel;
 
@@ -22,6 +24,9 @@ public class ProgressLogDialog extends JDialog {
 
         LogExtKt.setLogProxy(s -> {
             v_log.append(s + "\n");
+            int maximum = v_scroll.getVerticalScrollBar().getMaximum();
+            v_scroll.getViewport().setViewPosition(new Point(0,maximum));
+            v_scroll.updateUI();
             return null;
         });
 
@@ -52,23 +57,23 @@ public class ProgressLogDialog extends JDialog {
     }
 
     public void startTask(boolean isSelectP2E, ParserConfig config) {
-        try {
             new Thread(() -> {
-                if (isSelectP2E) {
-                    TransXmlToExcel.INSTANCE
-                            .initConfig(config)
-                            .start();
-                } else {
-                    TransExcelToXml.INSTANCE
-                            .initConfig(config)
-                            .start();
+                try {
+                    if (isSelectP2E) {
+                        TransXmlToExcel.INSTANCE
+                                .initConfig(config)
+                                .start();
+                    } else {
+                        TransExcelToXml.INSTANCE
+                                .initConfig(config)
+                                .start();
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                    dispose();
+                    Messages.showErrorDialog(e.getMessage(), "发生错误！"+e.getMessage());
                 }
             }).start();
-        } catch (Exception e) {
-            e.printStackTrace();
-            dispose();
-            Messages.showErrorDialog(e.getMessage(), "发生错误！"+e.getMessage());
-        }
     }
 
     private void onCancel() {
