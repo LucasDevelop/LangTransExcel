@@ -1,0 +1,35 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.5.10'
+    id 'org.jetbrains.intellij' version '1.1.6'
+    id 'java'
+}
+
+group 'com.lucas'
+version 'V1.0.0'
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation group: 'org.apache.poi', name: 'poi', version: '3.9'
+    // https://mvnrepository.com/artifact/org.dom4j/dom4j
+    implementation group: 'org.dom4j', name: 'dom4j', version: '2.1.1'
+    implementation group: 'jaxen', name: 'jaxen', version: '1.2.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
+}
+
+// See https://github.com/JetBrains/gradle-intellij-plugin/
+intellij {
+    version = '2020.1' // 因为Android Studio 4.1是基于IDEA 2020.1 Community版本开发的，所以这里调试也指定为此版本
+    plugins = ['android']
+}
+patchPluginXml {
+    changeNotes = """
+      V1.0.0:实现基本双向导入功能.<br>
+      <em></em>"""
+    sinceBuild = '191' // 插件适用的IDEA版本范围，此范围基本涵盖了Android Studio最近两三年的版本
+    untilBuild = '212.*'
+}

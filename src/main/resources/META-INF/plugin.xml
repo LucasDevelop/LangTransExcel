@@ -1,0 +1,29 @@
+<idea-plugin>
+    <id>com.lucas.LangTransExcel</id>
+    <name>Android Lang Transform Excel</name>
+    <vendor email="lucas_developer@163.com" url="https://github.com/LucasDevelop">Lucas</vendor>
+
+    <description><![CDATA[
+    一个可以将Android项目中语言资源提取并导出Excel表格的插件<br>
+    <em>安装后点击Tools->Android Lang Transform Excel运行插件</em>
+    ]]></description>
+
+    <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
+         on how to target different products -->
+    <depends>com.intellij.modules.platform</depends>
+<!--    支持xml文件操作-->
+    <depends>com.intellij.modules.xml</depends>
+<!--    AS相关-->
+    <depends>org.jetbrains.android</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+    </extensions>
+
+    <actions>
+        <!-- Add your actions here -->
+        <action id="config" class="com.lucas.lang.ui.InitConfig" text="Android Lang Transform Excel" description="Android Lang Transform Excel">
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
+        </action>
+    </actions>
+</idea-plugin>
