@@ -12,7 +12,7 @@ public class InitConfig extends AnAction {
     public void actionPerformed(AnActionEvent e) {
         InitConfigDialog dialog = new InitConfigDialog(e);
         dialog.setTitle("配置参数");
-        dialog.setMinimumSize(new Dimension(800,300));
+        dialog.setMinimumSize(new Dimension(800,350));
         dialog.setLocationRelativeTo(null);//剧中
         dialog.setVisible(true);
     }

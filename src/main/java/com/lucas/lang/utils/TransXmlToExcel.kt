@@ -240,9 +240,13 @@ object TransXmlToExcel {
             val moduleName = it.parentFile.parentFile.parentFile.parentFile.parentFile.name
             val langType =
                 if (!dirName.contains("-")) ParserConfig.excelDefRowName else dirName.substring(dirName.indexOf("-") + 1)
-            if (!parserConfig.langTypes.contains(langType)) throw ParserPluginException("ParserConfig.langTypes中缺少\"$langType\"语言类型")
+            if (!parserConfig.langTypes.contains(langType)){
+                log("ParserConfig.langTypes中缺少\"$langType\"语言类型")
+                return@map null
+//                throw ParserPluginException("ParserConfig.langTypes中缺少\"$langType\"语言类型")
+            }
             XmlFileBean(it, moduleName, langType)
-        }.toMutableList()
+        }.filterNotNull().toMutableList()
     }
 
     private fun getLangSheet(excelBook: HSSFWorkbook): HSSFSheet {
