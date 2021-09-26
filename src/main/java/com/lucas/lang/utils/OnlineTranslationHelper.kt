@@ -13,7 +13,13 @@ import java.io.UnsupportedEncodingException
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
-
+/**
+ * File OnlineTranslationHelper.kt
+ * Date 2021/9/24
+ * Author lucas
+ * Introduction 在线翻译工具
+ * 百度文档地址：http://api.fanyi.baidu.com/doc/21
+ */
 object OnlineTranslationHelper {
     private val client by lazy {
         OkHttpClient()
