@@ -1,7 +1,9 @@
 package com.lucas.lang.utils
 
 import com.lucas.lang.exception.ParserPluginException
+import com.lucas.lang.ext.formatTime
 import com.lucas.lang.ext.log
+import com.lucas.lang.ext.stringChartFormat
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Row
 import org.dom4j.Document
@@ -24,6 +26,7 @@ object TransExcelToXml {
 
     fun initConfig(parserConfig: ParserConfig): TransExcelToXml {
         TransExcelToXml.parserConfig = parserConfig
+        parserConfig.langTypes = ArrayList(parserConfig.orgLangTypes)
         //检查参数
         if (parserConfig.projectName.isEmpty()) throw ParserPluginException("projectName不能为空！")
         if (parserConfig.projectPath.isEmpty()) throw ParserPluginException("projectPath不能为空！")
@@ -36,9 +39,12 @@ object TransExcelToXml {
     }
 
     fun start() {
+        val startTime =System.currentTimeMillis()
         fileByRootElementMap.clear()
         trans()
         log("Complete!")
+        val endTime = System.currentTimeMillis()
+        log("耗时：${(endTime - startTime).formatTime()}")
     }
 
     private fun trans() {
@@ -85,7 +91,7 @@ object TransExcelToXml {
                     val dir = File(resDir, "values")
                     if (!dir.exists()) dir.mkdirs()
                     getDomHelper(dir).apply {
-                        val string = cell.richStringCellValue?.string
+                        val string = cell.richStringCellValue?.string?.stringChartFormat(keyName)
                         addElement("string").apply {
                             addText(string)
                             addAttribute("name", keyName)
@@ -97,7 +103,7 @@ object TransExcelToXml {
                     val dir = File(resDir, "values-${langName}")
                     if (!dir.exists()) dir.mkdirs()
                     getDomHelper(dir).apply {
-                        val string = cell.richStringCellValue?.string
+                        val string = cell.richStringCellValue?.string?.stringChartFormat(langName)
                         addElement("string").apply {
                             addText(string)
                             addAttribute("name", keyName)

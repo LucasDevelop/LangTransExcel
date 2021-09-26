@@ -3,7 +3,7 @@
   <grid id="cbd77" binding="contentPane" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
-      <xy x="48" y="54" width="722" height="312"/>
+      <xy x="48" y="54" width="722" height="337"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -49,7 +49,7 @@
           </grid>
         </children>
       </grid>
-      <grid id="e3588" layout-manager="GridLayoutManager" row-count="8" column-count="6" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="e3588" layout-manager="GridLayoutManager" row-count="9" column-count="6" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -67,7 +67,7 @@
           </component>
           <vspacer id="e4757">
             <constraints>
-              <grid row="7" column="0" row-span="1" col-span="6" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+              <grid row="8" column="0" row-span="1" col-span="6" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
             </constraints>
           </vspacer>
           <component id="ebd8f" class="javax.swing.JLabel" binding="Jlable2">
@@ -121,6 +121,8 @@
             </constraints>
             <properties>
               <dropMode value="INSERT"/>
+              <editable value="false"/>
+              <enabled value="false"/>
               <text value=""/>
             </properties>
           </component>
@@ -132,8 +134,8 @@
             </constraints>
             <properties>
               <dropMode value="INSERT"/>
-              <editable value="true"/>
-              <enabled value="true"/>
+              <editable value="false"/>
+              <enabled value="false"/>
               <text value=""/>
             </properties>
           </component>
@@ -148,7 +150,7 @@
           </component>
           <component id="7a69e" class="javax.swing.JLabel">
             <constraints>
-              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="请选择导入方向"/>
@@ -156,7 +158,7 @@
           </component>
           <component id="c6c96" class="javax.swing.JRadioButton" binding="v_project_to_excel">
             <constraints>
-              <grid row="6" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false">
+              <grid row="7" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false">
                 <preferred-size width="100" height="20"/>
               </grid>
             </constraints>
@@ -186,7 +188,7 @@
             <properties>
               <dropMode value="INSERT"/>
               <editable value="false"/>
-              <text value="(values-\\w{2,3})|(values)"/>
+              <text value="(values-[a-z]{2,3})|(values)$"/>
             </properties>
           </component>
           <component id="7971" class="javax.swing.JButton" binding="v_excel_path">
@@ -204,11 +206,27 @@
           </component>
           <component id="40f3c" class="javax.swing.JRadioButton" binding="v_excel_to_project">
             <constraints>
-              <grid row="6" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="7" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <horizontalAlignment value="0"/>
               <text value="Excel-&gt;项目"/>
+            </properties>
+          </component>
+          <component id="c9aa1" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="是否启用在线翻译补全"/>
+            </properties>
+          </component>
+          <component id="5302b" class="javax.swing.JCheckBox" binding="v_is_enable_online">
+            <constraints>
+              <grid row="6" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="yes"/>
             </properties>
           </component>
         </children>

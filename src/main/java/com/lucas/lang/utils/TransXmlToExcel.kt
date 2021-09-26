@@ -2,10 +2,7 @@ package com.lucas.lang.utils
 
 import com.lucas.lang.bean.*
 import com.lucas.lang.exception.ParserPluginException
-import com.lucas.lang.ext.log
-import com.lucas.lang.ext.logDividerEnd
-import com.lucas.lang.ext.logDividerStart
-import com.lucas.lang.ext.logDividerStartEnd
+import com.lucas.lang.ext.*
 import org.apache.poi.hssf.usermodel.*
 import org.apache.poi.hssf.util.HSSFColor
 import org.apache.poi.ss.usermodel.Font
@@ -23,29 +20,35 @@ import java.util.regex.Pattern
  * Introduction xml 导出 excel
  */
 object TransXmlToExcel {
-
     private lateinit var parserConfig: ParserConfig
 
     fun initConfig(parserConfig: ParserConfig): TransXmlToExcel {
         TransXmlToExcel.parserConfig = parserConfig
+        parserConfig.langTypes = ArrayList(parserConfig.orgLangTypes)
         //检查参数
+        if (parserConfig.isEnableOnlineTranslation && !parserConfig.orgLangTypes.contains(parserConfig.onlineByLangType))
+            throw ParserPluginException("onlineByLangType类型必须属于orgLangTypes中的一员！")
         if (parserConfig.projectName.isEmpty()) throw ParserPluginException("projectName不能为空！")
         if (parserConfig.projectPath.isEmpty()) throw ParserPluginException("projectPath不能为空！")
         if (!File(parserConfig.projectPath).exists()) throw ParserPluginException("项目地址：${parserConfig.projectPath}不存在！")
         if (!File(parserConfig.excelPath).exists()) throw ParserPluginException("请选择Excel地址！${parserConfig.excelPath}")
-        if (File(parserConfig.excelPath).isDirectory){
-            parserConfig.excelPath = parserConfig.excelPath+File.separator+ ParserConfig.defExcelName
+        if (File(parserConfig.excelPath).isDirectory) {
+            parserConfig.excelPath = parserConfig.excelPath + File.separator + ParserConfig.defExcelName
         }
         return this
     }
 
     fun start() {
+        val startTime = System.currentTimeMillis()
         parserConfig.langTypes.add(ParserConfig.indexModuleCell, ParserConfig.excelModuleRowName)
         parserConfig.langTypes.add(ParserConfig.indexKeyCell, ParserConfig.excelKeyRowName)
         parserConfig.langTypes.add(ParserConfig.indexDefCell, ParserConfig.excelDefRowName)
         parserConfig.langTypes.add(parserConfig.langTypes.size, ParserConfig.excelRemarkRowName)
         trans(File(parserConfig.projectPath), File(parserConfig.excelPath))
+        release()
         log("Complete!")
+        val endTime = System.currentTimeMillis()
+        log("耗时：${(endTime - startTime).formatTime()}")
     }
 
     private fun trans(projectPathFile: File, excelFile: File) {
@@ -56,28 +59,9 @@ object TransXmlToExcel {
         val langSheet = getLangSheet(excelBook)
 //        val titleRow = langSheet.getRow(0)//标题行
         //解析xml数据
-        val moduleElements = xmlFiles.groupBy { it.moduleName }.map { modulefiles ->
-            val elementByModule = mutableListOf<ElementPlus>()
-            //解析module下的xml
-            modulefiles.value.forEach { xmlFileBean ->
-                elementByModule.addAll(
-                    SAXReader().read(xmlFileBean.file).rootElement.elements()
-                        .map { ElementPlus(xmlFileBean.langType, it) })
-            }
-            //将module下的element根据key进行分组
-            elementByModule.groupBy { it.element.attribute("name").value }.map { elementPlus ->
-                elementPlus.value.map {
-                    val isCdata = it.element.content().any { it is CDATA }
-                    var cellValue = it.element.text
-                    if (isCdata) cellValue = "<![CDATA[$cellValue]]>"
-                    LangElement(
-                        it.langType,
-                        cellValue,
-                    )
-                }.let {
-                    RowElement(elementPlus.key, it, modulefiles.key)
-                }
-            }.let { ModuleBean(modulefiles.key, it) }
+        val moduleElements = parseXmlFile(xmlFiles)
+        if (parserConfig.isEnableOnlineTranslation) {
+            onlineTranslation(moduleElements)
         }
         //写入excel
         moduleElements.forEach { moduleBean ->
@@ -167,6 +151,61 @@ object TransXmlToExcel {
         excelBook.write(FileOutputStream(excelFile))
     }
 
+    //对数据进行在线翻译
+    private fun onlineTranslation(moduleElements: List<ModuleBean>) {
+        moduleElements.forEach {
+            it.rowBean.forEach { rowElement ->
+                //查找缺失的语言
+                val map = rowElement.langElements.map { it.rowName }
+                val missType = parserConfig.orgLangTypes.subtract(map)
+                //开始进行翻译--基于某个语言类型
+                val templateLang = rowElement.langElements.find { it.rowName == parserConfig.onlineByLangType }
+                if (templateLang != null) {
+                    missType.forEach { newType ->
+                        val text = templateLang.cellValue
+                        val from = parserConfig.onlineByLangType
+                        val to = newType
+                        OnlineTranslationHelper.transLang(text, from, to).also { onlineBean ->
+                            if (onlineBean.isSuccess && !onlineBean.trans_result.isNullOrEmpty()) {
+                                val element =
+                                    LangElement(newType, onlineBean.trans_result.first().dst, ElementStatus.NEW)
+                                rowElement.langElements.add(element)
+                            }
+                        }
+                    }
+                } else {
+                    log("跳过翻译，原因：module->${rowElement.moduleName},key->${rowElement.key}无缺少${parserConfig.onlineByLangType}类型资源")
+                }
+            }
+        }
+    }
+
+    //解析xml文件
+    private fun parseXmlFile(xmlFiles: MutableList<XmlFileBean>) =
+        xmlFiles.groupBy { it.moduleName }.map { modulefiles ->
+            val elementByModule = mutableListOf<ElementPlus>()
+            //解析module下的xml
+            modulefiles.value.forEach { xmlFileBean ->
+                elementByModule.addAll(
+                    SAXReader().read(xmlFileBean.file).rootElement.elements()
+                        .map { ElementPlus(xmlFileBean.langType, it) })
+            }
+            //将module下的element根据key进行分组
+            elementByModule.groupBy { it.element.attribute("name").value }.map { elementPlus ->
+                elementPlus.value.map {
+                    val isCdata = it.element.content().any { it is CDATA }
+                    var cellValue = it.element.text
+                    if (isCdata) cellValue = "<![CDATA[$cellValue]]>"
+                    LangElement(
+                        it.langType,
+                        cellValue,
+                    )
+                }.let {
+                    RowElement(elementPlus.key, it.toMutableList(), modulefiles.key)
+                }
+            }.let { ModuleBean(modulefiles.key, it) }
+        }
+
     private fun getExcelBook(excelFile: File): Pair<HSSFWorkbook, Boolean> {
         val excelBook: HSSFWorkbook
         var isNewExcelFile = false
@@ -239,7 +278,7 @@ object TransXmlToExcel {
     ) {
         //显示备注信息
         val remarkRow = sheet.getRow(0)
-        remarkRow.height = 200*20
+        remarkRow.height = 200 * 20
         var remarkCell = remarkRow.getCell(0)
         if (remarkCell == null) {
             remarkCell = remarkRow.createCell(0)
@@ -374,46 +413,11 @@ object TransXmlToExcel {
         return style
     }
 
-    private fun createRemarkStyle(excelBook: HSSFWorkbook): HSSFCellStyle? {
-        val style = excelBook.createCellStyle()
-        style.alignment = HSSFCellStyle.ALIGN_CENTER
-        style.fillPattern = HSSFCellStyle.SOLID_FOREGROUND
-        style.fillBackgroundColor = HSSFColor.DARK_RED.index
-        style.setFont(excelBook.createFont().also {
-            //标题放大加粗
-            it.color = HSSFColor.RED.index
-            it.boldweight = Font.BOLDWEIGHT_BOLD
-        })
-        return style
+    private fun release(){
+        normalCellStyle = null
+        newCellStyle = null
+        updateCellStyle = null
+        repeatCellStyle = null
+        errorCellStyle = null
     }
-
-    /**
-     * xml 文件写入到 excel->sheet
-     *
-     * @param xmlFile
-     * @param excelSheet
-     */
-    private fun xmlFileToExcel(xmlFile: File, excelSheet: HSSFSheet) {
-        val saxReader = SAXReader()
-        val xml = saxReader.read(xmlFile)
-        val rootElement = xml.rootElement
-        rootElement.elements().forEach {
-
-        }
-    }
-
-    fun parseXml(file: File) {
-        val saxReader = SAXReader()
-        val xml = saxReader.read(file)
-        val rootElement = xml.rootElement
-        rootElement.elements().forEach {
-            println(
-                "name:${it.name},key:${it.attribute("name").value},text:${it.text},nodeType:${it.nodeType},CDATA:${
-                    it.content().any { it is CDATA }
-                }"
-//                    + ",qName:${it.qName},content:${it.content()}"
-            )
-        }
-    }
-
 }

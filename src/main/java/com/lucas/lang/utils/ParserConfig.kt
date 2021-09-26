@@ -18,12 +18,18 @@ class ParserConfig(
     //是否跳过重复key
 //    val isBreakRepeatKeyIndex: Boolean = false,
     //支持的语言类型简写
-    val langTypes: MutableList<String> = arrayListOf("zh", "en", "ar", "es", "pt"),
+    val orgLangTypes: MutableList<String> = arrayListOf("zh", "en", "ar", "es", "pt"),
+    var langTypes: MutableList<String> = arrayListOf(),
     //excel -> project 是否自动补充缺失的语言类型文件夹以及文件
 //    val autoComplete: Boolean = true,
+    //是否开启在线翻译功能-自动补全缺失的语言
+    var isEnableOnlineTranslation: Boolean = true,
+
+    //在线翻译的基础语言
+    var onlineByLangType:String = "zh",
 
     //语言文件夹匹配正则
-    val dirPattern: String = "(values-\\w{2,3})|(values)"
+    val dirPattern: String = "(values-[a-z]{2,3})|(values)$"
 ) {
     companion object {
         const val excelModuleRowName = "Module"

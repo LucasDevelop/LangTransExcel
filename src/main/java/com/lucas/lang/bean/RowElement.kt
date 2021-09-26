@@ -8,7 +8,7 @@ package com.lucas.lang.bean
  */
 class RowElement(
     val key: String,
-    val langElements: List<LangElement>,
+    val langElements: MutableList<LangElement>,
     val moduleName: String,
 ) {
     override fun toString(): String {

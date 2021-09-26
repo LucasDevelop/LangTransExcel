@@ -23,10 +23,7 @@ public class ProgressLogDialog extends JDialog {
         getRootPane().setDefaultButton(buttonOK);
 
         LogExtKt.setLogProxy(s -> {
-            v_log.append(s + "\n");
-            int maximum = v_scroll.getVerticalScrollBar().getMaximum();
-            v_scroll.getViewport().setViewPosition(new Point(0,maximum));
-            v_scroll.updateUI();
+            addLog(s);
             return null;
         });
 
@@ -53,27 +50,29 @@ public class ProgressLogDialog extends JDialog {
     }
 
     public void addLog(String str) {
-        v_log.append(str);
+        v_log.append(str + "\n");
+        int maximum = v_scroll.getVerticalScrollBar().getMaximum();
+        v_scroll.getViewport().setViewPosition(new Point(0, maximum));
+        v_scroll.updateUI();
     }
 
     public void startTask(boolean isSelectP2E, ParserConfig config) {
-            new Thread(() -> {
-                try {
-                    if (isSelectP2E) {
-                        TransXmlToExcel.INSTANCE
-                                .initConfig(config)
-                                .start();
-                    } else {
-                        TransExcelToXml.INSTANCE
-                                .initConfig(config)
-                                .start();
-                    }
-                }catch (Exception e){
-                    e.printStackTrace();
-                    dispose();
-                    Messages.showErrorDialog(e.getMessage(), "发生错误！"+e.getMessage());
+        new Thread(() -> {
+            try {
+                if (isSelectP2E) {
+                    TransXmlToExcel.INSTANCE
+                            .initConfig(config)
+                            .start();
+                } else {
+                    TransExcelToXml.INSTANCE
+                            .initConfig(config)
+                            .start();
                 }
-            }).start();
+            } catch (Exception e) {
+                e.printStackTrace();
+                addLog("Error:"+e.getMessage());
+            }
+        }).start();
     }
 
     private void onCancel() {

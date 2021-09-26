@@ -26,6 +26,7 @@ public class InitConfigDialog extends JDialog {
     private JRadioButton v_project_to_excel;
     private JRadioButton v_excel_to_project;
     private JTextField v_dir_pattern;
+    private JCheckBox v_is_enable_online;
 
     public InitConfigDialog(AnActionEvent e) {
         setContentPane(contentPane);
@@ -51,7 +52,6 @@ public class InitConfigDialog extends JDialog {
                 onCancel();
             }
         });
-
         Project project = e.getData(PlatformDataKeys.PROJECT);
         v_project_name.setText(project.getName());
         v_project_path.setText(project.getBasePath());
@@ -84,11 +84,12 @@ public class InitConfigDialog extends JDialog {
         String langTypes = v_lang_types.getText();
         String dirPattern = v_dir_pattern.getText();
         boolean isCoverKey = v_is_conver_key.isSelected();
+        boolean isEnableOnline = v_is_enable_online.isSelected();
         String[] split = null;
         if (langTypes != null && !langTypes.equals("")) {
             split = langTypes.split(",");
             for (int i = 0; i < split.length; i++) {//去除空格
-                split[i] = split[i].replace(" ","");
+                split[i] = split[i].replace(" ", "");
             }
         }
         if (projectName == "") {
@@ -99,7 +100,7 @@ public class InitConfigDialog extends JDialog {
             Messages.showInfoMessage("请填写项目路径！", "错误");
             return;
         }
-        if (excelPath == ""||excelPath == "选择文件或者文件夹") {
+        if (excelPath == "" || excelPath == "选择文件或者文件夹") {
             Messages.showInfoMessage("请选择文件或者文件夹！", "错误");
             return;
         }
@@ -107,7 +108,15 @@ public class InitConfigDialog extends JDialog {
             Messages.showInfoMessage("请输入支持的语言类型简写(以逗号分隔)！", "错误");
             return;
         }
-        ParserConfig config = new ParserConfig(projectName, projectPath, excelPath, isCoverKey, new ArrayList<>(Arrays.asList(split)), dirPattern);
+        ParserConfig config = new ParserConfig(projectName,
+                projectPath,
+                excelPath,
+                isCoverKey,
+                new ArrayList<>(Arrays.asList(split)),
+                new ArrayList<String>(),
+                isEnableOnline,
+                "zh",
+                dirPattern);
         dispose();
         ProgressLogDialog dialog = new ProgressLogDialog();
         dialog.setTitle("转换进度");
