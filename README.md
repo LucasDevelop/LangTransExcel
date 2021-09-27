@@ -13,16 +13,27 @@
 
 言归正传，如同以上机械式工作作为一名程序猿当然是交给程序去处理喽，所以需要写一个能够遍历读取识别并提取项目中的语言资源文件，并将资源导出成Excel文件以方便交给其他工具人（手动狗头）进行翻译的脚本，翻译完成后还需要将Excel文件转换成项目中的资源格式并原路存储进去。为了更加方便的在各个项目中使用当然还是把上面写的脚本套上Intellij plugin的皮囊一起食用更佳。
 
+#### 支持功能：
+- [x] 将项目的res->values-xx-> strings.xml资源导出至excel文件（请勿修改表格的格式）
+- [x] 将excel文件文件中的资源导回至项目中（资源会原路径写入）
+- [x] 支持导出的资源使用颜色高亮状态<font color='green'>新增</font><font color='yellow'>覆盖</font><font color='red'>异常</font>
+- [x] 支持导出资源时自动在线翻译缺失的语言类型资源，并写入Excel中。（在线翻译使用的百度API，大量翻译可能会限制IP）
+- [x] 支持将Excel导回项目中时自动补全缺失的语言资源，以Excel中已存在的资源为准。
+
+<font color='red'>Tip:当前插件v1.0版本未经过大量测试，所以使用前务必先提交项目代码，以防不必要的损失。</font>
+
 ## 安装使用方式
 
 1. 安装插件
-> 插件jar包下载地址：https://github.com/LucasDevelop/LangTransExcel/blob/master/searchableOptions-V1.0.0.jar
-使用本地安装方式即可。
+> 插件jar包下载地址：https://github.com/LucasDevelop/LangTransExcel/blob/master/LangTransExcel-V1.0.0.zip
+使用本地安装,随后重启IDE。
+![image.png](https://upload-images.jianshu.io/upload_images/9625409-947c55c6c231d8c9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/740)
+
 
 2. 启动插件
 > 打开Android stuido 菜单栏Tools->Android Lang Transform Excel就会看到下面的配置弹窗，填写好配置，一般情况项目名称和项目路径无需修改，插件会自动读取当前项目参数并填写。其他参数也是有默认值，除了需要我们自己选择下Excel的文件地址，Excel地址可以是个文件夹脚本会自动判断并新建一个Excel文件。
 
-![image.png](https://upload-images.jianshu.io/upload_images/9625409-3dcf6320ef3f8159.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/740)
+![image.png](https://upload-images.jianshu.io/upload_images/9625409-e3b163fa18683f9f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/740)
 
 3. 运行脚本
 > 点击OK后开始运行脚本，并实时显示运行进度以及资源数据，耐心等待运行结束即可，具体效果如下。
@@ -59,15 +70,15 @@
 5. 配置Gradle
 > 如果插件要可安装在最近android studio版本请务必配置红框内容，否则会导致无法安装在Android studio上。
 intellij {
-    version = '2020.1' // 因为Android Studio 4.1是基于IDEA 2020.1 Community版本开发的，所以这里调试也指定为此版本
-    plugins = ['android']
+version = '2020.1' // 因为Android Studio 4.1是基于IDEA 2020.1 Community版本开发的，所以这里调试也指定为此版本
+plugins = ['android']
 }
 patchPluginXml {
-    changeNotes = """
-      V1.0.0:实现基本双向导入功能.<br>
-      <em></em>"""
-    sinceBuild = '191' // 插件适用的IDEA版本范围，此范围基本涵盖了Android Studio最近两三年的版本
-    untilBuild = '212.*'
+changeNotes = """
+V1.0.0:实现基本双向导入功能.<br>
+<em></em>"""
+sinceBuild = '191' // 插件适用的IDEA版本范围，此范围基本涵盖了Android Studio最近两三年的版本
+untilBuild = '212.*'
 }
 
 ![image.png](https://upload-images.jianshu.io/upload_images/9625409-96447dab795f2bf8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/740)
@@ -117,27 +128,13 @@ patchPluginXml {
 
 ## 国际化资源与Excel互导脚本开发
 > 主要是基于poi和dom4j的API进行文件操作，API 对应的Gradle依赖如下
- implementation group: 'org.apache.poi', name: 'poi', version: '3.9'
-    // https://mvnrepository.com/artifact/org.dom4j/dom4j
-    implementation group: 'org.dom4j', name: 'dom4j', version: '2.1.1'
-    implementation group: 'jaxen', name: 'jaxen', version: '1.2.0'
+implementation group: 'org.apache.poi', name: 'poi', version: '3.9'
+// https://mvnrepository.com/artifact/org.dom4j/dom4j
+implementation group: 'org.dom4j', name: 'dom4j', version: '2.1.1'
+implementation group: 'jaxen', name: 'jaxen', version: '1.2.0'
 
 ![image.png](https://upload-images.jianshu.io/upload_images/9625409-01effb4e9edbe068.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/740)
 
 > 具体文件查找Excel读取/写入实现代码已上传至gayhub,在下就不在这里指指点点了。相信各位大佬对于这种级别的API还是能把握住的。
 
 插件和脚本源码地址：https://github.com/LucasDevelop/LangTransExcel
-
-
-
-
-
-
-
-
-
-
-
-
-
-
