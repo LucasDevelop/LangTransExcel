@@ -30,7 +30,7 @@ intellij {
 }
 patchPluginXml {
     changeNotes = """
-      V1.0.0:实现基本双向导入功能.<br>
+      V1.0.0:Realize basic bidirectional import function and online translation.<br>
       <em></em>"""
     sinceBuild = '191' // 插件适用的IDEA版本范围，此范围基本涵盖了Android Studio最近两三年的版本
     untilBuild = '212.*'

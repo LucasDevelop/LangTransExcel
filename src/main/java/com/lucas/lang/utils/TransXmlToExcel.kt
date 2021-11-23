@@ -220,13 +220,13 @@ object TransXmlToExcel {
         return Pair(excelBook, isNewExcelFile)
     }
 
+    //扫描项目中的资源
     private fun scanProjectFiles(projectPathFile: File): MutableList<XmlFileBean> {
         val xmlFiles = mutableListOf<File>()
         FileUtil.findAllFile(projectPathFile, xmlFiles) {
             //匹配文件规则
             val parentFile = it.parentFile
             val matches = Pattern.compile(parserConfig.dirPattern).matcher(parentFile.name).find()
-//            val matches = parentFile.name.matches(Regex(parserConfig.dirPattern))
             return@findAllFile parentFile != null &&
                     parentFile.isDirectory &&
                     matches &&
