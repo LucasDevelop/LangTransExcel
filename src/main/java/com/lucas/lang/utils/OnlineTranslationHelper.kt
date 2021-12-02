@@ -5,6 +5,7 @@ import com.lucas.lang.bean.OnlineTransBean
 import com.lucas.lang.bean.TransResultBean
 import com.lucas.lang.exception.ParserPluginException
 import com.lucas.lang.ext.log
+import com.lucas.lang.v2.confoig.Constant
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -34,26 +35,14 @@ object OnlineTranslationHelper {
 
     var netLogCallback: ((msg: String) -> Unit)? = null
 
-    //百度翻译配置
-    private val baiduAppId = "20210924000954974"
-    private val baiduKey = "4C8QDD77vcxKVjwTCJsn"
-
-    //百度语言类型与Android的语言类型映射关系
-    private val baiduLangTypeMap = mapOf(
-        "zh" to "zh",
-        "en" to "en",
-        "ar" to "ara",
-        "es" to "spa",
-        "pt" to "pt",
-    )
 
     //同步请求翻译
     fun transLang(text: String, fromLang: String, toLang: String): OnlineTransBean {
-        if (!baiduLangTypeMap.containsKey(fromLang) || !baiduLangTypeMap.containsKey(toLang)) {
+        if (!Constant.baiduLangTypeMap.containsKey(fromLang) || !Constant.baiduLangTypeMap.containsKey(toLang)) {
             throw ParserPluginException("baiduLangTypeMap未配置$fromLang or $toLang 映射关系！")
         }
-        val realFromLang = baiduLangTypeMap[fromLang]!!
-        val realToLang = baiduLangTypeMap[toLang]!!
+        val realFromLang = Constant.baiduLangTypeMap[fromLang]!!
+        val realToLang = Constant.baiduLangTypeMap[toLang]!!
         val response = client.newCall(buildGetBaiduUrl(text, realFromLang, realToLang)).execute()
         var errorMsg: String
         if (response.isSuccessful) {
@@ -101,9 +90,9 @@ object OnlineTranslationHelper {
             .plus("?q=$text")
             .plus("&from=$fromLang")
             .plus("&to=$toLang")
-            .plus("&appid=$baiduAppId")
+            .plus("&appid=${Constant.baiduAppId}")
             .plus("&salt=$currentTimeMillis")
-            .plus("&sign=${getMD5Str(baiduAppId.plus(text).plus(currentTimeMillis).plus(baiduKey))}")
+            .plus("&sign=${getMD5Str(Constant.baiduAppId.plus(text).plus(currentTimeMillis).plus(Constant.baiduKey))}")
         return Request.Builder().url(url).get().build()
     }
 
@@ -116,9 +105,9 @@ object OnlineTranslationHelper {
             .addFormDataPart("q", text)
             .addFormDataPart("from", fromLang)
             .addFormDataPart("to", toLang)
-            .addFormDataPart("appid", baiduAppId)
+            .addFormDataPart("appid", Constant.baiduAppId)
             .addFormDataPart("salt", currentTimeMillis.toString())
-            .addFormDataPart("sign", getMD5Str(baiduAppId.plus(text).plus(currentTimeMillis).plus(baiduKey)))
+            .addFormDataPart("sign", getMD5Str(Constant.baiduAppId.plus(text).plus(currentTimeMillis).plus(Constant.baiduKey)))
             .build()
         return Request.Builder().url(url).post(build).build()
     }

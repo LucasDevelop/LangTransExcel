@@ -6,8 +6,8 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.lucas.lang.utils.CacheUtil;
 import com.lucas.lang.utils.FileUtil;
 import com.lucas.lang.utils.ParserConfig;
+import com.lucas.lang.v2.ui.SelectModelDialog;
 import kotlin.Unit;
-import kotlin.jvm.functions.Function0;
 import kotlin.jvm.functions.Function1;
 
 import javax.swing.*;
@@ -22,21 +22,25 @@ public class InitConfig extends AnAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
+        SelectModelDialog.Companion.show(e);
 //        InitConfigDialog dialog = new InitConfigDialog(e);
 //        dialog.setTitle("配置参数");
 //        dialog.setMinimumSize(new Dimension(800,350));
 //        dialog.setLocationRelativeTo(null);//剧中
 //        dialog.setVisible(true);
 
-        ParserConfig config = CacheUtil.INSTANCE.readConfig(e.getProject().getBasePath());
-        if (config ==null){
-            scanProject(e, parserConfig -> {
-                ConfigDialog.Companion.show(parserConfig,e);
-                return null;
-            });
-        }else {
-            ConfigDialog.Companion.show(config,e);
-        }
+//        String basePath = "/Users/lucas/Documents/developer/android/EgyptOutfield/egypt-outfield-android";
+////        String basePath = e.getProject().getBasePath();
+//        ParserConfig config = CacheUtil.INSTANCE.readConfig(basePath);
+//        if (config ==null){
+//            scanProject(e, parserConfig -> {
+//                ConfigDialog.Companion.show(parserConfig,e);
+//                return null;
+//            });
+//        }else {
+//            ConfigDialog.Companion.show(config,e);
+//
+//        }
     }
 
     public static void scanProject(AnActionEvent e, Function1<ParserConfig,Unit> block) {

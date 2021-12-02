@@ -293,8 +293,8 @@ object TransXmlToExcel {
             wrapText = true
             setFont(excelBook.createFont().apply {
                 //标题放大加粗
-                color = HSSFColor.RED.index
-                boldweight = Font.BOLDWEIGHT_BOLD
+//                color = HSSFColor.RED.index
+//                boldweight = Font.BOLDWEIGHT_BOLD
             })
         })
         remarkCell.setCellValue(HSSFRichTextString(ParserConfig.remark))
@@ -312,9 +312,9 @@ object TransXmlToExcel {
                 if (normalCellStyle == null) {
                     normalCellStyle = excelBook.createCellStyle().apply {
                         wrapText = true
-                        fillPattern = HSSFCellStyle.SOLID_FOREGROUND
-                        verticalAlignment = HSSFCellStyle.VERTICAL_CENTER
-                        fillForegroundColor = HSSFColor.WHITE.index
+//                        fillPattern = HSSFCellStyle.SOLID_FOREGROUND
+//                        verticalAlignment = HSSFCellStyle.VERTICAL_CENTER
+//                        fillForegroundColor = HSSFColor.WHITE.index
                     }
                 }
                 normalCellStyle!!
@@ -323,9 +323,9 @@ object TransXmlToExcel {
                 if (newCellStyle == null) {
                     newCellStyle = excelBook.createCellStyle().apply {
                         wrapText = true
-                        fillPattern = HSSFCellStyle.SOLID_FOREGROUND
-                        verticalAlignment = HSSFCellStyle.VERTICAL_CENTER
-                        fillForegroundColor = HSSFColor.SEA_GREEN.index
+//                        fillPattern = HSSFCellStyle.SOLID_FOREGROUND
+//                        verticalAlignment = HSSFCellStyle.VERTICAL_CENTER
+//                        fillForegroundColor = HSSFColor.SEA_GREEN.index
                     }
                 }
                 newCellStyle!!
@@ -334,9 +334,9 @@ object TransXmlToExcel {
                 if (updateCellStyle == null) {
                     updateCellStyle = excelBook.createCellStyle().apply {
                         wrapText = true
-                        fillPattern = HSSFCellStyle.SOLID_FOREGROUND
-                        verticalAlignment = HSSFCellStyle.VERTICAL_CENTER
-                        fillForegroundColor = HSSFColor.YELLOW.index
+//                        fillPattern = HSSFCellStyle.SOLID_FOREGROUND
+//                        verticalAlignment = HSSFCellStyle.VERTICAL_CENTER
+//                        fillForegroundColor = HSSFColor.YELLOW.index
                     }
                 }
                 updateCellStyle!!
@@ -348,9 +348,9 @@ object TransXmlToExcel {
                 if (repeatCellStyle == null) {
                     repeatCellStyle = excelBook.createCellStyle().apply {
                         wrapText = true
-                        fillPattern = HSSFCellStyle.SOLID_FOREGROUND
-                        verticalAlignment = HSSFCellStyle.VERTICAL_CENTER
-                        fillForegroundColor = HSSFColor.SKY_BLUE.index
+//                        fillPattern = HSSFCellStyle.SOLID_FOREGROUND
+//                        verticalAlignment = HSSFCellStyle.VERTICAL_CENTER
+//                        fillForegroundColor = HSSFColor.SKY_BLUE.index
                     }
                 }
                 repeatCellStyle!!
@@ -359,9 +359,9 @@ object TransXmlToExcel {
                 if (errorCellStyle == null) {
                     errorCellStyle = excelBook.createCellStyle().apply {
                         wrapText = true
-                        fillPattern = HSSFCellStyle.SOLID_FOREGROUND
-                        verticalAlignment = HSSFCellStyle.VERTICAL_CENTER
-                        fillForegroundColor = HSSFColor.RED.index
+//                        fillPattern = HSSFCellStyle.SOLID_FOREGROUND
+//                        verticalAlignment = HSSFCellStyle.VERTICAL_CENTER
+//                        fillForegroundColor = HSSFColor.RED.index
                     }
                 }
                 errorCellStyle!!
@@ -406,13 +406,13 @@ object TransXmlToExcel {
     //新建标题样式
     private fun createTitleStyle(excelBook: HSSFWorkbook): HSSFCellStyle? {
         val style = excelBook.createCellStyle()
-        style.alignment = HSSFCellStyle.ALIGN_CENTER
-        style.fillPattern = HSSFCellStyle.SOLID_FOREGROUND
-        style.fillBackgroundColor = HSSFColor.DARK_RED.index
+//        style.alignment = HSSFCellStyle.ALIGN_CENTER
+//        style.fillPattern = HSSFCellStyle.SOLID_FOREGROUND
+//        style.fillBackgroundColor = HSSFColor.DARK_RED.index
         style.setFont(excelBook.createFont().also {
             //标题放大加粗
-            it.color = HSSFColor.BLACK.index
-            it.boldweight = Font.BOLDWEIGHT_BOLD
+//            it.color = HSSFColor.BLACK.index
+//            it.boldweight = Font.BOLDWEIGHT_BOLD
         })
         return style
     }

@@ -11,6 +11,10 @@ fun Long.formatTime(): String {
     return "$h 小时 $m 分 $s 秒"
 }
 
+//是否需要用CDATA
+private val isNeedCdataPattern = "<\\/?.+?>"
+private val isCdataPattern = "^<!\\[CDATA\\[.+]]>\$"
+
 //简单错误校验
 private val sPattern = mapOf(
     "(% [sS])|(%S)" to "%s",
@@ -40,6 +44,12 @@ fun String.stringChartFormat(langType: String): String {
         sPatternSpacial.forEach {
             temp = Pattern.compile(it.key).matcher(temp).replaceAll(it.value)
         }
+    }
+    //转译符号替换<![CDATA[ ]]>
+    val find = Pattern.compile(isNeedCdataPattern).matcher(temp).find()
+    val isCData = Pattern.compile(isCdataPattern).matcher(temp).find()
+    if (find && !isCData) {
+        temp = "<![CDATA[$temp]]>"
     }
     return temp
 }

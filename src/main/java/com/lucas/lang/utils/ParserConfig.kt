@@ -8,7 +8,10 @@ import java.io.File
  * Author lucas
  * Introduction 初始化配置
  */
+
 class ParserConfig(
+
+
     //项目名称
     val projectName: String,
     //项目路径
