@@ -217,6 +217,7 @@ class InputConfigDialog(val anActionEvent: AnActionEvent, val inputConfig: Input
                     progressLog.addLog("耗时：${(System.currentTimeMillis() - startTime) / 1000}s")
                 })
             }catch (e:Exception){
+                e.printStackTrace()
                 progressLog.addLog("写入异常：${e.message}")
             }
 
@@ -224,7 +225,7 @@ class InputConfigDialog(val anActionEvent: AnActionEvent, val inputConfig: Input
         progressLog.isVisible = true
     }
 
-
+    //解析excel
     private fun parserExcel() {
         val file = File(inputConfig.excelPath)
         if (!file.exists()) {
@@ -264,6 +265,7 @@ class InputConfigDialog(val anActionEvent: AnActionEvent, val inputConfig: Input
         }
     }
 
+    //解析rows
     private fun parserData() {
         inputConfig.selectSheet?.also { selectSheet ->
             if (progressLogDialog == null)

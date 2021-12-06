@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'com.lucas'
-version 'V1.0.0'
+version 'V1.0.1'
 
 repositories {
     google()
@@ -35,6 +35,7 @@ intellij {
 patchPluginXml {
     changeNotes = """
       V1.0.0:Realize basic bidirectional import function and online translation.<br>
+      V1.0.1:兼容lxs和xlxs格式、优化插件UI、优化导出Excel文件展示格式.<br>
       <em></em>"""
     sinceBuild = '191' // 插件适用的IDEA版本范围，此范围基本涵盖了Android Studio最近两三年的版本
     untilBuild = '212.*'

@@ -7,8 +7,6 @@ object Constant {
     //语言类型语字符的映射关系
     val langMap = mapOf(
         "zh" to "中文",
-        "zh_CN" to "中文-中国",
-        "zh_TW" to "中文-台湾",
         "en" to "英文",
         "ar" to "阿拉伯语",
         "pt" to "葡萄牙语",

@@ -1,13 +1,17 @@
 package com.lucas.lang.v2.utils
 
+import com.lucas.lang.ext.log
 import com.lucas.lang.ext.stringChartFormat
+import com.lucas.lang.utils.OnlineTranslationHelper
 import com.lucas.lang.v2.bean.ModuleBean
 import com.lucas.lang.v2.bean.RowAttr
 import com.lucas.lang.v2.bean.RowBean
 import com.lucas.lang.v2.bean.XmlFileBean
 import com.lucas.lang.v2.confoig.Constant
+import com.lucas.lang.v2.confoig.ExportConfig
 import com.lucas.lang.v2.confoig.InputConfig
 import com.lucas.lang.v2.ext.ifExistsMakes
+import com.lucas.lang.v2.ext.ifExistsMakesByStrings
 import org.dom4j.CDATA
 import org.dom4j.Document
 import org.dom4j.DocumentHelper
@@ -34,6 +38,23 @@ object XmlParserUtil {
             error("参数配置错误.")
             return
         }
+        //检查创建项目中缺失的文件夹
+        if (inputConfig.isAutoCompletionDirOrFile) {
+            inputConfig.selectModuleBeans?.forEach { moduleBean ->
+                inputConfig.selectLangs?.forEach { selectLang ->
+                    val find = moduleBean.xmlFiles.find { it.langName == selectLang }
+                    if (find == null) {//未找到，补全
+                        val newXmlFileBean = XmlFileBean()
+                        newXmlFileBean.filePath = File(moduleBean.moduleFilePath, "src/main/res/values-${selectLang}/strings.xml")
+                            .ifExistsMakesByStrings(inputConfig.isAutoCompletionDirOrFile).absolutePath
+                        newXmlFileBean.langName = selectLang
+                        moduleBean.xmlFiles.add(newXmlFileBean)
+                        progress("新增文件：${newXmlFileBean.filePath}")
+                    }
+                }
+            }
+        }
+
         //将rowBean按照module进行分类，提高写入速度
         inputConfig.rows!!.groupBy { row ->
             inputConfig.selectModuleBeans?.find { row.rowAttr.moduleName == it.moduleName }
@@ -41,7 +62,9 @@ object XmlParserUtil {
             //加入默认语种
             val allLangRows = moduleBean?.xmlFiles?.toMutableList()
             val defLang = XmlFileBean()
-            defLang.filePath = File(moduleBean!!.moduleFilePath, "src/main/res/values/strings.xml").ifExistsMakes().absolutePath
+            defLang.filePath =
+                File(moduleBean!!.moduleFilePath, "src/main/res/values/strings.xml")
+                    .ifExistsMakesByStrings(inputConfig.isAutoCompletionDirOrFile).absolutePath
             defLang.langName = Constant.DEF_LANG
             allLangRows?.add(defLang)
             //将每个module的row按照语言类型写入
@@ -50,8 +73,8 @@ object XmlParserUtil {
                     progress("跳过语种：${xmlFileBean.langName}")
                     return@forEach
                 }
-                val xmlFile = File(xmlFileBean.filePath).ifExistsMakes()
-                var doc: Document?
+                val xmlFile = File(xmlFileBean.filePath).ifExistsMakesByStrings(inputConfig.isAutoCompletionDirOrFile)
+                var doc: Document? = null
                 if (!xmlFile.exists()) {//新增文件
                     if (inputConfig.isAutoCompletionDirOrFile) {
                         xmlFile.createNewFile()
@@ -59,18 +82,19 @@ object XmlParserUtil {
                         doc = DocumentHelper.createDocument()
                         val rootElement = DocumentHelper.createElement("resources")
                         doc.rootElement = rootElement
-                        addRowToDoc(rows, xmlFileBean, rootElement, progress, inputConfig, doc)
+                        addRowToDoc(rows, xmlFileBean, progress, inputConfig, doc)
+                    }
+                } else {
+                    if (!xmlFile.exists()) {
+                        error("文件未找到：${xmlFileBean.filePath}")
+                        return@forEach
+                    } else {//新增\修改字段
+                        doc = SAXReader().read(xmlFile)
+                        addRowToDoc(rows, xmlFileBean, progress, inputConfig, doc)
                     }
                 }
-                if (!xmlFile.exists()) {
-                    error("文件未找到：${xmlFileBean.filePath}")
-                    return@forEach
-                } else {//新增\修改字段
-                    doc = SAXReader().read(xmlFile)
-                    val rootElement = doc.rootElement
-                    addRowToDoc(rows, xmlFileBean, rootElement, progress, inputConfig, doc)
-                }
-                writeDocToFile(doc, xmlFile)
+                if (doc != null)
+                    writeDocToFile(doc, xmlFile)
                 progress("写入完成：${xmlFileBean.filePath}")
             }
         }
@@ -80,7 +104,6 @@ object XmlParserUtil {
     private fun addRowToDoc(
         rows: List<RowBean>,
         xmlFileBean: XmlFileBean,
-        rootElement: Element,
         progress: (msg: String) -> Unit,
         inputConfig: InputConfig,
         doc: Document
@@ -101,7 +124,7 @@ object XmlParserUtil {
                     val element = DocumentHelper.createElement("string")
                     element.addAttribute("name", row.rowAttr.keyName)
                     element.text = insertValue
-                    rootElement.add(element)
+                    doc.rootElement.add(element)
                 }
                 progress("写入字段:${row.rowAttr.keyName}->$value")
             }
@@ -114,6 +137,7 @@ object XmlParserUtil {
         format.encoding = "UTF-8"
         format.isNewlines = true
         format.indent = "\t"
+        format.isTrimText = true//去掉之前的空格
         val xmlWriter = XMLWriter(fileOutputStream, format)
         //设置是否转义。默认true，代表转义
         xmlWriter.isEscapeText = false
@@ -123,9 +147,9 @@ object XmlParserUtil {
     }
 
     //将xml转化未RowBean
-    fun parseXmlByModule(modules: List<ModuleBean>, block: (RowBean) -> Unit): HashMap<ModuleBean, ArrayList<RowBean>> {
+    fun parseXmlByModule(config: ExportConfig, block: (RowBean) -> Unit): HashMap<ModuleBean, ArrayList<RowBean>> {
         val hashMap = HashMap<ModuleBean, ArrayList<RowBean>>()
-        modules.forEach { module ->
+        config.selectModuleBeans?.forEach { module ->
             val rows = ArrayList<RowBean>()
             module.xmlFiles.forEach { file ->
                 if (File(file.filePath).exists()) {
@@ -152,6 +176,28 @@ object XmlParserUtil {
                 }
             }
             hashMap[module] = rows
+            //语言类型补全或翻译
+            config.selectLangs?.forEach { lang ->
+                rows.forEach { rowBean ->
+                    if (!rowBean.langs.containsKey(lang)) {
+                        val onlineTransLangType = config.onlineTransLangType
+                        val text =
+                            if (config.onlineTransLangType.isNullOrBlank()) null else rowBean.langs[config.onlineTransLangType]
+                        if (config.isEnableOnlineTrans && !onlineTransLangType.isNullOrBlank() && !text.isNullOrBlank()) {//翻译
+                            OnlineTranslationHelper.transLang(text, onlineTransLangType, lang) {
+                                log("在线翻译：$it")
+                            }.also {
+                                if (it.isSuccess && !it.trans_result.isNullOrEmpty())
+                                    rowBean.langs[lang] = it.trans_result.first().dst
+                                else
+                                    rowBean.langs[lang] = ""
+                            }
+                        } else {//补空-否则导致导出数据错位
+                            rowBean.langs[lang] = ""
+                        }
+                    }
+                }
+            }
         }
         return hashMap
     }

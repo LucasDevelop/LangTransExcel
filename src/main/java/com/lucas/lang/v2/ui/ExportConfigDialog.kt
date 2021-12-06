@@ -33,8 +33,6 @@ class ExportConfigDialog(val exportConfig: ExportConfig, val anActionEvent: AnAc
         setSize(300, 300)
     }
 
-    private var exportRB: JRadioButton? = null
-    private var importRB: JRadioButton? = null
     private var onlineLangTypeCombo: JComboBox<String>? = null
     private var excelPath: JTextField? = null
     private var moduleJCheckBoxList: List<JCheckBox>? = null
@@ -49,10 +47,6 @@ class ExportConfigDialog(val exportConfig: ExportConfig, val anActionEvent: AnAc
 
     private fun Box.refreshViews() {
         removeAll()
-//        add(createButtonsBox())
-//        add(Box.createVerticalStrut(10))
-//        add(createModelTypeBox())
-//        add(Box.createVerticalStrut(10))
         add(createFilePathBox())
         add(Box.createVerticalStrut(10))
         add(createModulesBox(exportConfig.allModuleBeans?.map { it.moduleName } ?: mutableListOf()))
@@ -71,21 +65,10 @@ class ExportConfigDialog(val exportConfig: ExportConfig, val anActionEvent: AnAc
         add(createOnlineLangTempType())
     }
 
-    private fun createButtonsBox(): JComponent =
-        Box.createHorizontalBox().apply {
-            val jButton = JButton("重新扫描项目")
-            add(jButton)
-            jButton.addActionListener {
-                InitConfig.scanProject(anActionEvent) {
-                    rootBox?.refreshViews()
-                }
-            }
-        }
-
     //是否启用在线翻译
     private fun createOnlineTransBox(): JComponent =
         Box.createHorizontalBox().also { parent ->
-            parent.add(JLabel("在线翻译:").labelSize())
+            parent.add(JLabel("开启在线API翻译:").labelSize())
             parent.add(Box.createHorizontalGlue())
             val jCheckBox = JCheckBox("启用/关闭")
             jCheckBox.addActionListener {
@@ -207,7 +190,7 @@ class ExportConfigDialog(val exportConfig: ExportConfig, val anActionEvent: AnAc
             val startTime = System.currentTimeMillis()
             Thread {
                 progressLogDialog.addLog("开始导出数据")
-                XmlParserUtil.parseXmlByModule(exportConfig.selectModuleBeans!!) {
+                XmlParserUtil.parseXmlByModule(exportConfig) {
                     progressLogDialog.addLog("导出字段:${it}")
                 }.also {
                     progressLogDialog.addLog("开始写入Excel")

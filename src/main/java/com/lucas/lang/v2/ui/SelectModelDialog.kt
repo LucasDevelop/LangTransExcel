@@ -49,6 +49,7 @@ class SelectModelDialog(val anActionEvent: AnActionEvent) : DialogWrapper(true) 
                 group.add(importRB)
             }
             box.add(exportRB)
+            box.add(Box.createVerticalStrut(20))
             box.add(importRB)
         }
 

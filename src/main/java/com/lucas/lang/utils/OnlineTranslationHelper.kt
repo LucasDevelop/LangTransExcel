@@ -37,7 +37,7 @@ object OnlineTranslationHelper {
 
 
     //同步请求翻译
-    fun transLang(text: String, fromLang: String, toLang: String): OnlineTransBean {
+    fun transLang(text: String, fromLang: String, toLang: String,block:((msg:String)->Unit)?=null): OnlineTransBean {
         if (!Constant.baiduLangTypeMap.containsKey(fromLang) || !Constant.baiduLangTypeMap.containsKey(toLang)) {
             throw ParserPluginException("baiduLangTypeMap未配置$fromLang or $toLang 映射关系！")
         }
@@ -48,7 +48,7 @@ object OnlineTranslationHelper {
         if (response.isSuccessful) {
             try {
                 val message = response.body().string()
-                log("[在线翻译]text:$text,$fromLang->$toLang,response:$message")
+                block?.invoke("text:$text,$fromLang->$toLang,response:$message")
                 val fromJson = gson.fromJson(message, OnlineTransBean::class.java)
                 response.close()
                 fromJson.apply {
@@ -62,6 +62,7 @@ object OnlineTranslationHelper {
         }
         response.close()
         errorMsg = "请求失败："
+        block?.invoke(errorMsg)
         val onlineTransBean =
             OnlineTransBean(false, realFromLang, realToLang, "1", errorMsg, arrayListOf(TransResultBean(text, "")))
         return retry(onlineTransBean, text, fromLang, toLang)

@@ -88,11 +88,12 @@ object ExcelUtil {
         //创建sheet
         val writeSheet = WriteSheet()
         writeSheet.sheetName = sheetName
+        writeSheet.sheetNo =2
         //创建表头
         val writeTable = WriteTable()
         writeTable.tableNo = 1
         val headData = mutableListOf(
-            mutableListOf("字段属性", Constant.FIELD_PROPERTY),
+            mutableListOf("字段属性(请勿修改内容)", Constant.FIELD_PROPERTY),
         )
         val langHead = exportConfig.selectLangs?.map {
             mutableListOf(Constant.langMap[it]!!, it)
@@ -121,7 +122,6 @@ object ExcelUtil {
                     //冻结第一行
                     super.afterSheetCreate(writeWorkbookHolder, writeSheetHolder)
                     writeSheetHolder?.sheet?.createFreezePane(0, 1, 0, 1)
-                    writeSheetHolder?.sheet?.autoSizeColumn(10)
                 }
             })
             .build()
