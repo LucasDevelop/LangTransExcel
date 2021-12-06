@@ -1,9 +1,6 @@
 package com.lucas.lang.ui;
 
-import com.intellij.openapi.ui.Messages;
 import com.lucas.lang.ext.LogExtKt;
-import com.lucas.lang.utils.TransExcelToXml;
-import com.lucas.lang.utils.TransXmlToExcel;
 import com.lucas.lang.utils.ParserConfig;
 
 import javax.swing.*;
@@ -16,6 +13,14 @@ public class ProgressLogDialog extends JDialog {
     private JScrollPane v_scroll;
     private JButton buttonOK;
 //    private JButton buttonCancel;
+
+    public static ProgressLogDialog getInstance(String title) {
+        ProgressLogDialog progressLogDialog = new ProgressLogDialog();
+        progressLogDialog.setTitle(title);
+        progressLogDialog.setMinimumSize(new Dimension(600, 300));
+        progressLogDialog.setLocationRelativeTo(null); //剧中
+        return progressLogDialog;
+    }
 
     public ProgressLogDialog() {
         setContentPane(contentPane);
@@ -50,30 +55,14 @@ public class ProgressLogDialog extends JDialog {
     }
 
     public void addLog(String str) {
-        v_log.append(str + "\n");
-        int maximum = v_scroll.getVerticalScrollBar().getMaximum();
-        v_scroll.getViewport().setViewPosition(new Point(0, maximum));
-        v_scroll.updateUI();
+        SwingUtilities.invokeLater(() -> {
+            v_log.append(str + "\n");
+            int maximum = v_scroll.getVerticalScrollBar().getMaximum();
+            v_scroll.getViewport().setViewPosition(new Point(0, maximum));
+            v_scroll.updateUI();
+        });
     }
 
-    public void startTask(boolean isSelectP2E, ParserConfig config) {
-        new Thread(() -> {
-            try {
-                if (isSelectP2E) {
-                    TransXmlToExcel.INSTANCE
-                            .initConfig(config)
-                            .start();
-                } else {
-                    TransExcelToXml.INSTANCE
-                            .initConfig(config)
-                            .start();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                addLog("Error:"+e.getMessage());
-            }
-        }).start();
-    }
 
     private void onCancel() {
         // add your code here if necessary

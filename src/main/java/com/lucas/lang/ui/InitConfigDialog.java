@@ -108,22 +108,22 @@ public class InitConfigDialog extends JDialog {
             Messages.showInfoMessage("请输入支持的语言类型简写(以逗号分隔)！", "错误");
             return;
         }
-        ParserConfig config = new ParserConfig(projectName,
-                projectPath,
-                excelPath,
-                isCoverKey,
-                new ArrayList<>(Arrays.asList(split)),
-                new ArrayList<String>(),
-                isEnableOnline,
-                "zh",
-                dirPattern);
-        dispose();
-        ProgressLogDialog dialog = new ProgressLogDialog();
-        dialog.setTitle("转换进度");
-        dialog.setMinimumSize(new Dimension(600, 300));
-        dialog.setLocationRelativeTo(null);//剧中
-        dialog.startTask(v_project_to_excel.isSelected(), config);
-        dialog.setVisible(true);
+//        ParserConfig config = new ParserConfig(projectName,
+//                projectPath,
+//                excelPath,
+//                isCoverKey,
+//                new ArrayList<>(Arrays.asList(split)),
+//                new ArrayList<String>(),
+//                isEnableOnline,
+//                "zh",
+//                dirPattern);
+//        dispose();
+//        ProgressLogDialog dialog = new ProgressLogDialog();
+//        dialog.setTitle("转换进度");
+//        dialog.setMinimumSize(new Dimension(600, 300));
+//        dialog.setLocationRelativeTo(null);//剧中
+//        dialog.startTask(v_project_to_excel.isSelected(), config);
+//        dialog.setVisible(true);
     }
 
     private void onCancel() {

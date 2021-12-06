@@ -1,11 +1,11 @@
 <idea-plugin>
     <id>com.lucas.LangTransExcel</id>
-    <name>Android Lang Transform Excel</name>
+    <name>LangResExport</name>
     <vendor email="lucas_developer@163.com" url="https://github.com/LucasDevelop">Lucas</vendor>
 
     <description><![CDATA[
-    一个可以将Android项目中语言资源提取并导出Excel表格的插件<br>
-    <em>安装后点击Tools->Android Lang Transform Excel运行插件</em>
+    An Android project language resources can be extracted and exported to Excel spreadsheet plug-in<br>
+    <em>Once installed, click Tools->Android Lang Transform Excel to run the plugin</em>
     ]]></description>
 
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html

@@ -72,7 +72,9 @@
           </vspacer>
           <component id="ebd8f" class="javax.swing.JLabel" binding="Jlable2">
             <constraints>
-              <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+                <preferred-size width="166" height="14"/>
+              </grid>
             </constraints>
             <properties>
               <text value="目标项目路径(默认当前项目)"/>
@@ -116,7 +118,7 @@
           <component id="6c4ca" class="javax.swing.JTextField" binding="v_project_path">
             <constraints>
               <grid row="1" column="2" row-span="1" col-span="4" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                <preferred-size width="150" height="-1"/>
+                <preferred-size width="150" height="14"/>
               </grid>
             </constraints>
             <properties>

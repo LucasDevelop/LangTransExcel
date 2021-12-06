@@ -1,12 +1,17 @@
 package com.lucas.lang.utils
 
+import java.io.File
+
 /**
  * File ParserConfig.kt
  * Date 2021/8/26
  * Author lucas
  * Introduction 初始化配置
  */
+
 class ParserConfig(
+
+
     //项目名称
     val projectName: String,
     //项目路径
@@ -29,7 +34,10 @@ class ParserConfig(
     var onlineByLangType:String = "zh",
 
     //语言文件夹匹配正则
-    val dirPattern: String = "(values-[a-z]{2,3})|(values)$"
+    val dirPattern: String = "(values-[a-z]{2,3})|(values)$",
+
+    //module dir
+    val moduleDir: MutableList<File> = mutableListOf()
 ) {
     companion object {
         const val excelModuleRowName = "Module"
