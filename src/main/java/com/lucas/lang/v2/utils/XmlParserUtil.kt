@@ -45,8 +45,9 @@ object XmlParserUtil {
                     val find = moduleBean.xmlFiles.find { it.langName == selectLang }
                     if (find == null) {//未找到，补全
                         val newXmlFileBean = XmlFileBean()
-                        newXmlFileBean.filePath = File(moduleBean.moduleFilePath, "src/main/res/values-${selectLang}/strings.xml")
-                            .ifExistsMakesByStrings(inputConfig.isAutoCompletionDirOrFile).absolutePath
+                        newXmlFileBean.filePath =
+                            File(moduleBean.moduleFilePath, "src/main/res/values-${selectLang}/strings.xml")
+                                .ifExistsMakesByStrings(inputConfig.isAutoCompletionDirOrFile).absolutePath
                         newXmlFileBean.langName = selectLang
                         moduleBean.xmlFiles.add(newXmlFileBean)
                         progress("新增文件：${newXmlFileBean.filePath}")
@@ -114,18 +115,42 @@ object XmlParserUtil {
                 lang = inputConfig.defValueLangName!!
             }
             if (row.langs.containsKey(lang)) {
-                //判断字段是否已存在
                 val value = row.langs[lang]
                 val insertValue = if (inputConfig.isSmartFix) value?.stringChartFormat(lang) else value
-                val selectNodes = doc.selectNodes("/resources/string[@name='${row.rowAttr.keyName}']")
-                if (!selectNodes.isNullOrEmpty()) {//重复字段直接覆盖内容
-                    selectNodes.first().text = insertValue
-                } else {//新增字段
-                    val element = DocumentHelper.createElement("string")
-                    element.addAttribute("name", row.rowAttr.keyName)
-                    element.text = insertValue
-                    doc.rootElement.add(element)
+                if (row.rowAttr.isArray) {//数组
+                    val selectNodes = doc.selectNodes("/resources/string-array[@name='${row.rowAttr.keyName}']")
+                    if (!selectNodes.isNullOrEmpty()) {
+                        val arrayElement = selectNodes.first() as? Element
+                        arrayElement?.elements()?.also { items ->
+                            if (items.size > row.rowAttr.arrayItemIndex) {//重复字段直接覆盖内容
+                                items[row.rowAttr.arrayItemIndex].text = insertValue
+                            } else {//新增item
+                                val newItem = DocumentHelper.createElement("item")
+                                newItem.text = insertValue
+                                arrayElement.add(newItem)
+                            }
+                        }
+                    } else {//新增string-array
+                        val newArrayElement = DocumentHelper.createElement("string-array")
+                        newArrayElement.addAttribute("name", row.rowAttr.keyName)
+                        val newItem = DocumentHelper.createElement("item")
+                        newItem.text = insertValue
+                        newArrayElement.add(newItem)
+                        doc.rootElement.add(newArrayElement)
+                    }
+                } else {
+                    //判断字段是否已存在
+                    val selectNodes = doc.selectNodes("/resources/string[@name='${row.rowAttr.keyName}']")
+                    if (!selectNodes.isNullOrEmpty()) {//重复字段直接覆盖内容
+                        selectNodes.first().text = insertValue
+                    } else {//新增字段
+                        val element = DocumentHelper.createElement("string")
+                        element.addAttribute("name", row.rowAttr.keyName)
+                        element.text = insertValue
+                        doc.rootElement.add(element)
+                    }
                 }
+
                 progress("写入字段:${row.rowAttr.keyName}->$value")
             }
         }
@@ -156,22 +181,45 @@ object XmlParserUtil {
                     val elementIterator = SAXReader().read(file.filePath).rootElement.elementIterator()
                     while (elementIterator.hasNext()) {
                         val element = elementIterator.next()
-                        val isCdata = element.content().any { it is CDATA }
-                        var cellValue = element.text
-                        val key = element.attribute("name").value
-                        if (isCdata) cellValue = "<![CDATA[$cellValue]]>"
-                        val row = rows.find { it.rowAttr.keyName == key } ?: RowBean().apply {
-                            if (rowAttr == null) {
-                                rowAttr = RowAttr()
+                        if (element.name == "string-array") {//字符串数组
+                            val key = element.attribute("name").value
+                            element.elements().forEachIndexed { index, arrayItem ->
+                                val isCdata = arrayItem.content().any { it is CDATA }
+                                var cellValue = arrayItem.text
+                                if (isCdata) cellValue = "<![CDATA[$cellValue]]>"
+                                val row = rows.find { it.rowAttr.keyName == key && it.rowAttr.arrayItemIndex == index }
+                                    ?: RowBean().apply {
+                                        if (rowAttr == null) {
+                                            rowAttr = RowAttr()
+                                        }
+                                        rowAttr.isArray = true
+                                        rowAttr.keyName = key
+                                        rowAttr.arrayItemIndex = index
+                                        rowAttr.moduleName = module.moduleName
+                                        syncRowAttr()
+                                        rows.add(this)
+                                    }
+                                row.langs[file.langName] = cellValue
+                                block(row)
                             }
-                            rowAttr.keyName = key
-                            rowAttr.moduleName = module.moduleName
-                            syncRowAttr()
-                            rows.add(this)
+                        } else {
+                            val isCdata = element.content().any { it is CDATA }
+                            var cellValue = element.text
+                            val key = element.attribute("name").value
+                            if (isCdata) cellValue = "<![CDATA[$cellValue]]>"
+                            val row =
+                                rows.find { it.rowAttr.keyName == key && !it.rowAttr.isArray } ?: RowBean().apply {
+                                    if (rowAttr == null) {
+                                        rowAttr = RowAttr()
+                                    }
+                                    rowAttr.keyName = key
+                                    rowAttr.moduleName = module.moduleName
+                                    syncRowAttr()
+                                    rows.add(this)
+                                }
+                            row.langs[file.langName] = cellValue
+                            block(row)
                         }
-                        row.langs[file.langName] = cellValue
-//                        row.setLangValue(file.langName, cellValue)
-                        block(row)
                     }
                 }
             }

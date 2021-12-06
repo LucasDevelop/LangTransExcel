@@ -37,7 +37,6 @@ class InputConfigDialog(val anActionEvent: AnActionEvent, val inputConfig: Input
         setSize(300, 300)
     }
 
-    //    var rbs: List<JRadioButton>? = null
     private var excelPath: JTextField? = null
     private var rootBox: Box? = null
     private var sheetCombo: JComboBox<String>? = null

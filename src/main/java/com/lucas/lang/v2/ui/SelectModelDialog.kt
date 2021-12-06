@@ -75,8 +75,8 @@ class SelectModelDialog(val anActionEvent: AnActionEvent) : DialogWrapper(true) 
         complete: () -> Unit
     ) {
         config.projectName = anActionEvent.project?.name ?: ""
-        //            exportConfig.projectPath = anActionEvent.project?.basePath ?: ""
-        config.projectPath = "/Users/lucas/Documents/developer/android/EgyptOutfield/egypt-outfield-android"
+        config.projectPath = anActionEvent.project?.basePath ?: ""
+//        config.projectPath = "/Users/lucas/Documents/developer/android/EgyptOutfield/egypt-outfield-android"
         progressLogDialog.addLog("开始扫描项目文件")
         scanProjectFile(progressLogDialog, config) {
             progressLogDialog.dispose()
