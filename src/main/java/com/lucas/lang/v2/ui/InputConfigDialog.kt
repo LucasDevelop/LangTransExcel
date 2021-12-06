@@ -277,6 +277,11 @@ class InputConfigDialog(val anActionEvent: AnActionEvent, val inputConfig: Input
                     progressLogDialog?.addLog("错误：$errorMsg")
                 }, { rows ->
                     inputConfig.rows = rows
+                    if (inputConfig.rows.isNullOrEmpty()){
+                        SwingUtilities.invokeLater { progressLogDialog?.isVisible = false }
+                        "页码:\"${inputConfig.selectSheet?.sheetName}\"未读取到数据".showError()
+                        return@readRowsBySheetName
+                    }
                     //读取语言类型
                     if (inputConfig.allLangs.isNullOrEmpty()) {
                         progressLogDialog?.addLog("错误：未读取到语言类型")
